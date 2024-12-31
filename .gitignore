@@ -1,0 +1,34 @@
+# Entorno Virtual de Python
+venv/
+*.pyc
+__pycache__/
+
+# Archivos de configuración
+.env
+*.sqlite3
+
+# Archivos de Django
+/static/
+media/
+
+# Archivos de logs
+*.log
+
+# Configuración de IDEs y entornos locales
+.vscode/
+.idea/
+
+# Node.js (React frontend)
+frontend/node_modules/
+frontend/build/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de paquetes de Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Credenciales
+backend/credentials/
