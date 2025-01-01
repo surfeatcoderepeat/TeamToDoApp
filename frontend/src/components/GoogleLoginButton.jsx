@@ -12,7 +12,8 @@ const GoogleLoginButton = () => {
             const response = await axios.post('/auth/google-login-success/', { token });
             localStorage.setItem('access', response.data.access);
             localStorage.setItem('refresh', response.data.refresh);
-            alert('Inicio de sesión exitoso');
+            // Después de autenticar correctamente
+            navigate('/dashboard');
         } catch (error) {
             console.error('Error en el inicio de sesión:', error);
         }

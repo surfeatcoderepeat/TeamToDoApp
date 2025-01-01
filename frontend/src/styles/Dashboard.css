@@ -1,0 +1,30 @@
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+.dashboard-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* overflow: hidden; Asegura que el contenido no desborde */
+}
+
+.dashboard-content {
+    display: flex;
+    flex: 1;
+    position: relative; /* Posiciona las flechas dentro del contenedor */
+    overflow: hidden;
+}
+
+.dashboard-columns {
+    display: flex;
+    flex: 1;
+    overflow-x: auto; /* Permite el desplazamiento horizontal */
+    padding: 20px; /* Evita que las columnas toquen el borde */
+    gap: 20px; /* Espaciado entre las columnas */
+    min-height: 0; /* Soluciona problemas de flexbox en algunos navegadores */
+}
+

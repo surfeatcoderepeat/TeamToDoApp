@@ -1,0 +1,48 @@
+.navigation-arrows {
+    position: absolute; /* Asegura que estén dentro del contenedor */
+    top: 50%; /* Centra verticalmente */
+    width: 100%; /* Ocupa todo el ancho */
+    pointer-events: none; /* Evita bloquear clics en otros elementos */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10; /* Por encima de las columnas */
+}
+
+.arrow i {
+    font-size: 20px;
+}
+
+
+.arrow-left {
+    position: absolute;
+    left: 10px; /* Separación del borde izquierdo */
+}
+
+.arrow-right {
+    position: absolute;
+    right: 10px; /* Separación del borde derecho */
+}
+
+.arrow {
+    pointer-events: all; /* Permite clics en los botones */
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+    opacity: 0.8; /* Transparencia inicial */
+}
+
+.arrow:hover {
+    transform: scale(1.1); /* Efecto de ampliación */
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo claro semitransparente */
+    color: black;
+    opacity: 1; /* Opacidad total al hacer hover */
+}

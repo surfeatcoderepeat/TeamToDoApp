@@ -1,0 +1,33 @@
+.sidebar {
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+    height: 100vh;
+    margin-top: 10px;
+}
+
+.sidebar-logo {
+    margin-bottom: 20px; /* Espacio entre el logo y el menú */
+}
+
+.sidebar-logo img {
+    width: 50px; /* Ajusta el tamaño del logo */
+    height: auto;
+    border-radius: 50%; /* Opcional: Hace que el logo sea circular */
+    filter: brightness(0) invert(1);
+}
+
+.sidebar-menu button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.sidebar-menu button:hover {
+    color: #a5a5ff;
+}

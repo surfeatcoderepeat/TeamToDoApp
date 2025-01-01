@@ -1,0 +1,47 @@
+.days-column {
+    background-color: #2b2b2b;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 0 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.days-column-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.days-column-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #fff;
+}
+
+.days-column-header p {
+    margin: 0;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.tasks-list {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.add-task-button {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.add-task-button:hover {
+    background-color: #555;
+}
