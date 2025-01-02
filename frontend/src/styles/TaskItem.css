@@ -2,42 +2,69 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px;
-    background-color: #333;
-    border-radius: 5px;
-    color: #fff;
+    border-bottom: 1px solid #666;
+    padding: 5px 10px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    height: 20px;
+    height: 15px;
+    margin: 0 10px;
+}
+
+.task-item span {
+    flex: 1;
+    color: #ddd;
 }
 
 .task-item:hover {
-    background-color: #444;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-.task-item.completed .task-title {
-    text-decoration: line-through;
-    color: #aaa;
+.task-item-buttons {
+    display: flex;
+    gap: 5px;
 }
 
-.task-title {
-    flex: 1;
+.task-item-edit,
+.task-item-delete {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.task-item-edit:hover,
+.task-item-delete:hover {
+    color: #fff;
+}
+
+.task-text {
+    flex-grow: 1;
+    cursor: pointer;
+}
+
+.task-input {
+    flex-grow: 1;
+    border: none;
+    background: transparent;
+    color: #fff;
     font-size: 16px;
+    outline: none;
 }
 
 .task-actions {
     display: flex;
-    gap: 8px;
+    gap: 5px;
 }
 
-.task-actions button {
+.action-btn {
     background: none;
     border: none;
-    color: #aaa;
+    color: #fff;
+    font-size: 12px;
     cursor: pointer;
-    font-size: 16px;
+    padding: 2px;
 }
 
-.task-actions button:hover {
-    color: #fff;
+.action-btn:hover {
+    color: #ff5555;
 }

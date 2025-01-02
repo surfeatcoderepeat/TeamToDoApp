@@ -1,28 +1,34 @@
-import React from "react";
-import TaskItem from "./TaskItem";
-import "../styles/DaysColumn.css";
+import React from 'react';
+import TaskItem from './TaskItem';
+import '../styles/DaysColumn.css'; // Asegúrate de que el archivo CSS exista y tenga los estilos necesarios
 
-const DaysColumn = ({ dayName, date, tasks, onTaskCreate, onTaskUpdate }) => {
+const DaysColumn = ({ dayName, date, tasks, maxTasks, onCreateTask, onUpdateTask, onDeleteTask }) => {
+    // Crear líneas vacías si no hay suficientes tareas
+    const totalLines = [...tasks];
+    while (totalLines.length < maxTasks) {
+        totalLines.push({ id: null, title: '', day: dayName });
+    }
+
     return (
         <div className="days-column">
+            {/* Encabezado de la columna */}
             <div className="days-column-header">
                 <h2>{dayName}</h2>
                 <p>{date}</p>
             </div>
-            <div className="tasks-list">
-                {tasks.map((task) => (
+            {/* Lista de tareas */}
+            <div className="days-column-tasks">
+                {totalLines.map((task, index) => (
                     <TaskItem
-                        key={task.id}
+                        key={index}
                         task={task}
-                        onUpdate={onTaskUpdate}
+                        onCreateTask={onCreateTask}
+                        onUpdateTask={onUpdateTask}
+                        onDeleteTask={onDeleteTask}
+                        day={dayName}
+                        index={index}
                     />
                 ))}
-                <button
-                    className="add-task-button"
-                    onClick={onTaskCreate}
-                >
-                    + Nueva Tarea
-                </button>
             </div>
         </div>
     );

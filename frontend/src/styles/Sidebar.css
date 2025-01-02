@@ -1,15 +1,18 @@
 .sidebar {
-    width: 80px;
+    width: 60px; /* Ancho fijo para el sidebar */
+    height: 100vh; /* Ocupa toda la altura de la ventana */
     display: flex;
     flex-direction: column;
+    justify-content: space-between; /* Distribuye espacio entre los elementos */
     align-items: center;
-    padding: 10px 0;
-    height: 100vh;
-    margin-top: 10px;
+    background-color: #1a1a1a; /* Color de fondo */
+    padding: 10px 0; /* Espaciado vertical */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* Sombra para destacar el sidebar */
 }
 
 .sidebar-logo {
-    margin-bottom: 20px; /* Espacio entre el logo y el menú */
+    margin: 5px;
+    margin-bottom: 30px;
 }
 
 .sidebar-logo img {
@@ -19,15 +22,37 @@
     filter: brightness(0) invert(1);
 }
 
-.sidebar-menu button {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 20px;
-    margin-bottom: 20px;
-    cursor: pointer;
+.top-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espaciado entre los botones */
 }
 
-.sidebar-menu button:hover {
-    color: #a5a5ff;
+.bottom-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espaciado entre los botones */
+    margin-bottom: 20px; /* Espacio inferior para evitar que toquen el borde */
+}
+
+button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background-color: #2f2a2a; 
+    color: #fff; /* Color de los íconos */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #555; /* Color de fondo al pasar el mouse */
+}
+
+button i {
+    font-size: 16px; /* Tamaño del ícono */
 }

@@ -37,7 +37,7 @@
     align-items: center;
     cursor: pointer;
     transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
-    opacity: 0.8; /* Transparencia inicial */
+    opacity: 0.5; /* Transparencia inicial */
 }
 
 .arrow:hover {
