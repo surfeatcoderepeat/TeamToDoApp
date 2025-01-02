@@ -2,9 +2,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* background-color: #2f2f40; Nuevo color */
     padding: 10px 20px; /* Espaciado más cómodo */
-    /* border-bottom: 1px solid #333; */
     color: #ffffff;
     height: 20px;
 
@@ -28,4 +26,15 @@
 
 .project-header .menu-button:hover {
     color: #cccccc; /* Efecto hover */
+}
+
+.project-header input {
+    border: none; /* Elimina el borde */
+    background: transparent; /* Fondo transparente */
+    color: inherit; /* Usa el color del texto del contenedor */
+    width: 100%; /* Asegura que ocupe todo el espacio disponible */
+    font-size: inherit; /* Hereda el tamaño de fuente del contenedor */
+    font-family: inherit; /* Hereda la fuente del contenedor */
+    outline: none; /* Elimina el borde azul al enfocar */
+    padding: 0; /* Elimina el relleno */
 }

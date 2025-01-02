@@ -18,18 +18,12 @@
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.task-item-buttons {
-    display: flex;
-    gap: 5px;
-}
 
 .task-item-edit,
 .task-item-delete {
-    background: none;
-    border: none;
     color: #888;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 10px;
 }
 
 .task-item-edit:hover,
@@ -42,29 +36,22 @@
     cursor: pointer;
 }
 
-.task-input {
-    flex-grow: 1;
-    border: none;
-    background: transparent;
-    color: #fff;
-    font-size: 16px;
-    outline: none;
+.task-item input {
+    border: none; /* Elimina el borde */
+    background: transparent; /* Fondo transparente */
+    color: inherit; /* Usa el color del texto del contenedor */
+    width: 100%; /* Asegura que ocupe todo el espacio disponible */
+    font-size: inherit; /* Hereda el tamaño de fuente del contenedor */
+    font-family: inherit; /* Hereda la fuente del contenedor */
+    outline: none; /* Elimina el borde azul al enfocar */
+    padding: 0; /* Elimina el relleno */
 }
 
-.task-actions {
-    display: flex;
-    gap: 5px;
+.task-item.completed .task-item-placeholder {
+    text-decoration: line-through;
+    color: #aaa; /* Color desvanecido para indicar completado */
 }
 
-.action-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 12px;
-    cursor: pointer;
-    padding: 2px;
-}
-
-.action-btn:hover {
-    color: #ff5555;
+.task-item-placeholder {
+    cursor: pointer; /* Indica que es interactivo */
 }

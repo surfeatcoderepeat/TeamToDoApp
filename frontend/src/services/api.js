@@ -14,7 +14,6 @@ api.interceptors.request.use(
         
         // Agregar el token al encabezado si existe
         if (token) {
-            console.log("Incluyendo token en la solicitud:", token);
             config.headers['Authorization'] = `Bearer ${token}`;
         } else {
             console.log("No se encontró un token de acceso en localStorage.");

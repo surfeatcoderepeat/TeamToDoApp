@@ -1,6 +1,8 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 
 class Project(models.Model):
     name = models.CharField(max_length=200)
@@ -24,6 +26,7 @@ class ShareToken(models.Model):
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='tasks', null=True)
     title = models.CharField(max_length=200)
+    date = models.DateTimeField(default=timezone.now)
     description = models.TextField(blank=True, null=True)
     completed = models.BooleanField(default=False)
     priority = models.CharField(
