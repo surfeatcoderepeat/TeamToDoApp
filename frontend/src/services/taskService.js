@@ -7,10 +7,10 @@ export const getTasksByProject = async (projectId) => {
 };
 
 // Crear una nueva tarea dentro de un proyecto
-export const createTask = async ({ day, index, title, projectId }) => {
+export const createTask = async ({ date, index, title, projectId }) => {
     try {
         const response = await api.post(`/api/projects/${projectId}/tasks/`, {
-            day,
+            date,
             index,
             title,
         });

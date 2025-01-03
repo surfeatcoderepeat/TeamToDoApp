@@ -1,6 +1,10 @@
 import React from 'react';
 import TaskItem from './TaskItem';
 import '../styles/DaysColumn.css'; // Asegúrate de que el archivo CSS exista y tenga los estilos necesarios
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { formatDateToLocal } from '../utils/dateUtils';
+
 
 const DaysColumn = ({ dayName, date, tasks = [], maxTasks = 20, onCreateTask, onUpdateTask, onDeleteTask, onToggleComplete }) => {
     // Crear líneas vacías si no hay suficientes tareas
@@ -13,7 +17,7 @@ const DaysColumn = ({ dayName, date, tasks = [], maxTasks = 20, onCreateTask, on
             {/* Encabezado de la columna */}
             <div className="days-column-header">
                 <h2>{dayName}</h2>
-                <p>{date}</p>
+                <p>{formatDateToLocal(date)}</p>
             </div>
             {/* Lista de tareas */}
             <div className="days-column-tasks">
@@ -26,6 +30,7 @@ const DaysColumn = ({ dayName, date, tasks = [], maxTasks = 20, onCreateTask, on
                         onDeleteTask={onDeleteTask} // Handler global pasado desde Dashboard
                         onToggleComplete={onToggleComplete}
                         day={dayName}
+                        date={date}
                         index={index}
                     />
                 ))}

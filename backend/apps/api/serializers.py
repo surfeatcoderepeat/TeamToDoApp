@@ -19,6 +19,11 @@ class ProjectSerializer(serializers.ModelSerializer):
         read_only_fields = ['users']
 
 class TaskSerializer(serializers.ModelSerializer):
+    formatted_date = serializers.SerializerMethodField()
+
     class Meta:
         model = Task
-        fields = ['id', 'project', 'title', 'description', 'completed', 'priority', 'user', 'cost', 'date', 'created_at', 'updated_at']
+        fields = ['id', 'project', 'title', 'description', 'completed', 'priority', 'user', 'cost', 'date', 'formatted_date', 'created_at', 'updated_at']
+
+    def get_formatted_date(self, obj):
+        return obj.date.strftime('%Y-%m-%d')

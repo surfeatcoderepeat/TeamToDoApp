@@ -36,20 +36,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Aplicaciones propias
-    # 'backend.apps.accounts',          # Cuentas de usuario
-    # 'apps.api',               # API
     'backend.apps.google_auth',       # Autenticación Google
-    # 'apps.realtime',          # WebSockets
-    # Django Allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',  # Proveedor de Google OAuth
-    # rest_framework
     'rest_framework',
     'rest_framework_simplejwt',
-    # CORS
     'corsheaders',
     'backend.apps.api',
 ]
@@ -68,9 +61,6 @@ MIDDLEWARE = [
 
 
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",  # URL del frontend
-# ]
 CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_TRUSTED_ORIGINS = [
@@ -172,7 +162,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',  # Backend de Allauth
 ]
 
-LOGIN_REDIRECT_URL = '/'  # Después de iniciar sesión
+LOGIN_REDIRECT_URL = '/dashboard/'  # Después de iniciar sesión
 LOGOUT_REDIRECT_URL = '/'  # Después de cerrar sesión
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -189,6 +179,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # rest_framework
 REST_FRAMEWORK = {
+    'DATETIME_FORMAT': '%Y-%m-%d',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),

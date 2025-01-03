@@ -2,7 +2,7 @@ import React from 'react';
 import '../styles/Sidebar.css'; // Asegúrate de tener el archivo de estilos
 import logo from '../assets/images/logo_mare.png';
 
-const Sidebar = () => {
+const Sidebar = ({ onSettingsClick }) => {
     return (
         <div className="sidebar">
             {/* Logo en la parte superior */}
@@ -19,7 +19,9 @@ const Sidebar = () => {
 
             {/* Botones inferiores */}
             <div className="bottom-buttons">
-                <button><i className="fas fa-cog"></i></button>
+                <button onClick={onSettingsClick}>
+                    <i className="fas fa-cog"></i> {/* Engranaje para abrir el SettingsModal */}
+                </button>
             </div>
         </div>
     );

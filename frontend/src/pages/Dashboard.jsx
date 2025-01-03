@@ -4,6 +4,7 @@ import ProjectHeader from '../components/ProjectHeader';
 import DaysColumn from '../components/DaysColumn';
 import NavigationArrows from '../components/NavigationArrows';
 import ProjectSelectorModal from '../components/ProjectSelectorModal';
+import SettingsModal from '../components/SettingsModal';
 import '../styles/Dashboard.css';
 
 import {
@@ -16,19 +17,80 @@ import {
     createTask,
     updateTask,
     deleteTask,
-    patchTask
+    patchTask,
 } from '../services/taskService';
 
 const Dashboard = () => {
     const [projectName, setProjectName] = useState('Nuevo Proyecto');
-    const [visibleDays] = useState(['Lunes', 'Martes', 'Miércoles']);
-    const [tasks, setTasks] = useState([]);
+    const [tasksByDate, setTasksByDate] = useState({});
     const [currentProject, setCurrentProject] = useState(null);
     const [projectId, setProjectId] = useState(null);
     const [projects, setProjects] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false); // Estado para el modal de configuración
+    const [visibleDaysCount, setVisibleDaysCount] = useState(3); // Controlar días visibles
+    const [currentDate, setCurrentDate] = useState(new Date()); // Día actual
+    const [loadedDates, setLoadedDates] = useState(new Set()); // Fechas ya cargadas
+    const [tasks, setTasks] = useState([]); // Estado de las tareas
 
-    // Cargar los proyectos iniciales
+    const generateVisibleDays = () => {
+        const days = [];
+        for (let i = -Math.floor(visibleDaysCount / 2); i <= Math.floor(visibleDaysCount / 2); i++) {
+            const date = new Date(currentDate);
+            date.setDate(currentDate.getDate() + i); // Desplazar días
+            days.push({
+                name: date.toLocaleDateString('es-ES', { weekday: 'long' }), // Día de la semana
+                date: date.toISOString().split('T')[0], // Usar toISOString para obtener YYYY-MM-DD
+            });
+        }
+        return days;
+    };
+
+    const visibleDays = generateVisibleDays();
+
+    // Navegación de días
+    const handleNavigate = (direction) => {
+        const directionValue = direction === 'left' ? -1 : direction === 'right' ? 1 : 0;
+        const newDate = new Date(currentDate);
+        newDate.setDate(currentDate.getDate() + directionValue);
+        setCurrentDate(newDate);
+    };
+
+    // Cargar tareas solo para fechas visibles que aún no están cargadas
+    const loadTasksForVisibleDays = async () => {
+        if (!projectId) return;
+    
+        const datesToLoad = visibleDays
+            .map((day) => day.date)
+            .filter((date) => !loadedDates.has(date)); // Fechas aún no cargadas
+    
+        if (datesToLoad.length === 0) return; // Nada que cargar
+    
+        try {
+            const allTasks = await getTasksByProject(projectId);
+    
+            // Filtrar tareas por las fechas que necesitamos
+            const filteredTasks = allTasks.filter((task) =>
+                datesToLoad.includes(task.date.split('T')[0]) // Asegura el formato correcto
+            );
+    
+            // Organizar las tareas por fecha
+            const tasksGroupedByDate = filteredTasks.reduce((acc, task) => {
+                const taskDate = task.date.split('T')[0]; // Extraer solo la fecha
+                if (!acc[taskDate]) acc[taskDate] = [];
+                acc[taskDate].push(task);
+                return acc;
+            }, {});
+    
+            // Actualizar el estado de tareas y fechas cargadas
+            setTasksByDate((prev) => ({ ...prev, ...tasksGroupedByDate }));
+            setLoadedDates((prev) => new Set([...prev, ...datesToLoad]));
+        } catch (error) {
+            console.error('Error al cargar tareas:', error);
+        }
+    };
+
+    // Cargar tareas iniciales y proyectos
     useEffect(() => {
         const loadInitialData = async () => {
             try {
@@ -39,7 +101,6 @@ const Dashboard = () => {
                     setCurrentProject(project);
                     setProjectName(project.name);
                     setProjectId(project.id);
-                    await loadTasks(project.id);
                 }
             } catch (error) {
                 console.error('Error al cargar proyectos:', error);
@@ -49,91 +110,49 @@ const Dashboard = () => {
         loadInitialData();
     }, []);
 
-    // Cargar las tareas del proyecto actual
-    const loadTasks = async (projectId) => {
-        try {
-            const taskList = await getTasksByProject(projectId);
-            setTasks(taskList || []); // Asegúrate de que siempre sea un array
-        } catch (error) {
-            console.error('Error al cargar tareas:', error);
-            setTasks([]); // Limpia tareas en caso de error
-        }
-    };
+    // Cargar tareas al cambiar `visibleDays` o `projectId`
+    useEffect(() => {
+        loadTasksForVisibleDays();
+    }, [visibleDays, projectId]);
 
-    // Manejar la selección de un proyecto
     const handleSelectProject = async (project) => {
         setCurrentProject(project);
         setProjectName(project.name);
         setProjectId(project.id);
-        console.log('ProjectId:', project.id)
-        try {
-            await loadTasks(project.id); // Carga las tareas del proyecto seleccionado
-        } catch (error) {
-            console.error('Error al cambiar de proyecto:', error);
-        }
-        setIsModalOpen(false); // Cierra el modal
+        setTasks([]); // Limpiar tareas al cambiar de proyecto
+        setLoadedDates(new Set()); // Reiniciar fechas cargadas
+        setIsProjectModalOpen(false);
     };
 
-    // Manejar la eliminación de un proyecto
-    const handleDeleteProject = async (projectId) => {
-        try {
-            await deleteProject(projectId);
-            setProjects((prev) => prev.filter((project) => project.id !== projectId));
-
-            // Si el proyecto actual fue eliminado, restablece el estado
-            if (currentProject?.id === projectId) {
-                setCurrentProject(null);
-                setProjectName('Nuevo Proyecto');
-                setProjectId(null);
-                setTasks([]);
-            }
-        } catch (error) {
-            console.error('Error al eliminar el proyecto:', error);
-        }
-    };
-
-    // Crear y seleccionar un nuevo proyecto
-    const createAndSelectProject = async () => {
-        try {
-            const newProject = await createProject({ name: 'Nuevo Proyecto' });
-            setProjects((prev) => [...prev, newProject]);
-            setCurrentProject(newProject);
-            setProjectName(newProject.name);
-            setProjectId(newProject.id);
-            setTasks([]); // Limpia las tareas al crear un nuevo proyecto
-            setIsModalOpen(false);
-        } catch (error) {
-            console.error('Error al crear el proyecto:', error);
-        }
-    };
-
-    // Manejar la creación de una nueva tarea
-    const handleCreateTask = async (day, index, title) => {
+    const handleCreateTask = async (day, date, index, title) => {
         try {
             if (!projectId) {
                 throw new Error('No hay un proyecto seleccionado.');
             }
+            // Crear nueva tarea en el backend
             const newTask = await createTask({
-                day,
+                date: date, // Aquí usamos el parámetro `day` como la fecha específica
                 index,
                 title,
-                projectId, // Asociar la tarea al proyecto actual
+                projectId,
             });
-            setTasks((prev) => [...prev, newTask]);
-            console.log(`Tarea creada: ${newTask.title}`);
+    
+            // Actualizar el estado local con la nueva tarea
+            setTasksByDate((prev) => ({
+                ...prev,
+                [date]: [...(prev[date] || []), newTask],
+            }));
         } catch (error) {
             console.error('Error al crear la tarea:', error);
         }
     };
 
-    // Manejar la actualización de una tarea existente
     const handleUpdateTask = async (taskId, data) => {
         try {
             const updatedTask = await updateTask(projectId, taskId, data);
             setTasks((prev) =>
                 prev.map((task) => (task.id === taskId ? updatedTask : task))
             );
-            console.log(`Tarea actualizada: ${updatedTask.title}`);
         } catch (error) {
             console.error('Error al actualizar la tarea:', error);
         }
@@ -141,31 +160,29 @@ const Dashboard = () => {
 
     const handleToggleComplete = async (taskId, completed) => {
         try {
-            if (!projectId) {
-                throw new Error('No hay un proyecto seleccionado.');
-            }
-    
-            // Envía la actualización al backend
             const updatedTask = await patchTask(projectId, taskId, { completed });
-    
-            // Actualiza el estado local de las tareas
-            setTasks((prevTasks) =>
-                prevTasks.map((task) =>
+            setTasks((prev) =>
+                prev.map((task) =>
                     task.id === taskId ? { ...task, completed: updatedTask.completed } : task
                 )
             );
-    
-            console.log(`Tarea actualizada: ${updatedTask.title}, completada: ${updatedTask.completed}`);
         } catch (error) {
             console.error('Error al actualizar el estado de completado:', error);
         }
     };
 
-    // Manejar la eliminación de una tarea
     const handleDeleteTask = async (taskId) => {
         try {
+            const taskToDelete = Object.values(tasksByDate).flat().find(task => task.id === taskId);
+            if (!taskToDelete) return;
+
             await deleteTask(projectId, taskId);
-            setTasks((prev) => prev.filter((task) => task.id !== taskId));
+            // Actualizar el estado local
+            const taskDate = taskToDelete.date.split('T')[0];
+            setTasksByDate((prev) => ({
+                ...prev,
+                [taskDate]: prev[taskDate].filter((task) => task.id !== taskId),
+            }));
         } catch (error) {
             console.error('Error al eliminar la tarea:', error);
         }
@@ -173,28 +190,26 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard-container">
-            <Sidebar />
+            <Sidebar onSettingsClick={() => setIsSettingsModalOpen(true)} />
             <div className="dashboard-main">
                 <ProjectHeader
                     projectId={projectId}
                     projectName={projectName}
                     setProjectName={(newName) => setProjectName(newName)}
-                    onMenuClick={() => setIsModalOpen(true)}
+                    onMenuClick={() => setIsProjectModalOpen(true)}
                     setProjectId={setProjectId}
                 />
                 <div className="dashboard-content">
-                    <NavigationArrows onNavigate={() => {}} />
+                    <NavigationArrows
+                        onNavigate={(direction) => handleNavigate(direction)}
+                    />
                     <div className="dashboard-columns">
                         {visibleDays.map((day, index) => (
-                            <DaysColumn
+                           <DaysColumn
                                 key={index}
-                                dayName={day}
-                                date={`2025-01-0${index + 1}`}
-                                tasks={tasks.filter((task) => {
-                                    // Normaliza el formato de task.date (si es necesario)
-                                    const taskDate = typeof task.date === 'string' ? task.date.split('T')[0] : task.date;
-                                    return taskDate === `2025-01-0${index + 1}`;
-                                })}
+                                dayName={day.name}
+                                date={day.date}
+                                tasks={tasksByDate[day.date] || []} // Tareas específicas para esta fecha
                                 maxTasks={20}
                                 onCreateTask={handleCreateTask}
                                 onUpdateTask={handleUpdateTask}
@@ -205,13 +220,18 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div>
-            {isModalOpen && (
+            {isProjectModalOpen && (
                 <ProjectSelectorModal
                     projects={projects}
-                    onClose={() => setIsModalOpen(false)}
+                    onClose={() => setIsProjectModalOpen(false)}
                     onSelectProject={handleSelectProject}
-                    createAndSelectProject={createAndSelectProject}
-                    onDeleteProject={handleDeleteProject}
+                />
+            )}
+            {isSettingsModalOpen && (
+                <SettingsModal
+                    visibleDaysCount={visibleDaysCount}
+                    setVisibleDaysCount={setVisibleDaysCount}
+                    onClose={() => setIsSettingsModalOpen(false)}
                 />
             )}
         </div>

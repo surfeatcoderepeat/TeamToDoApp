@@ -1,8 +1,10 @@
 import React from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import axios from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const GoogleLoginButton = () => {
+    const navigate = useNavigate()
     const handleSuccess = async (credentialResponse) => {
         try {
             // Limpia tokens viejos antes de procesar el nuevo inicio de sesión
