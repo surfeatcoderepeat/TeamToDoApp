@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/ProjectHeader.css';
 import { patchProject, createProject } from '../services/projectService';
 
-const ProjectHeader = ({ projectId, projectName, setProjectId, setProjectName, onMenuClick }) => {
+const ProjectHeader = ({ projectId, projectName, setProjectId, setProjectName, onMenuClick, setCurrentProject, handleUpdateProjectName }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [newProjectName, setNewProjectName] = useState(projectName || 'Nuevo Proyecto');
     const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +29,8 @@ const ProjectHeader = ({ projectId, projectName, setProjectId, setProjectName, o
                     // Si el proyecto ya existe, actualizarlo
                     const updatedProject = await patchProject(projectId, { name: newProjectName });
                     setProjectName(updatedProject.name); // Asegurarse de actualizar el nombre
+                    setCurrentProject(updatedProject.name);
+                    handleUpdateProjectName(updatedProject.name)
                 } else {
                     // Si no existe, preguntar al usuario si desea crearlo
                     const confirmCreate = window.confirm(

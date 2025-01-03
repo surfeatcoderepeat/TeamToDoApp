@@ -26,5 +26,8 @@
     padding: 20px; /* Evita que las columnas toquen el borde */
     gap: 20px; /* Espaciado entre las columnas */
     min-height: 0; /* Soluciona problemas de flexbox en algunos navegadores */
+    max-width: 100%;
+    flex-wrap: wrap;
+    
 }
 

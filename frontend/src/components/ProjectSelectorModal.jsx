@@ -1,7 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../styles/ProjectSelectorModal.css';
 
 const ProjectSelectorModal = ({ projects, onClose, onSelectProject, createAndSelectProject, onDeleteProject }) => {
+    
+    // Agregar listeners de clic y escape al montar el componente
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                onClose(); // Cierra el modal cuando presionas Escape
+            }
+        };
+
+        const handleClickOutside = (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                onClose(); // Cierra el modal cuando se hace clic fuera del contenido
+            }
+        };
+
+        document.addEventListener('keydown', handleEscape);
+        document.addEventListener('click', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [onClose]);
+
     return (
         <div className="modal-overlay">
             <div className="modal-content">
@@ -9,8 +33,11 @@ const ProjectSelectorModal = ({ projects, onClose, onSelectProject, createAndSel
                 <ul className="project-list">
                     {projects.map((project) => (
                         <li key={project.id} className="project-item">
-                            <span className="project-name" 
-                            onClick={() => {onSelectProject(project)}}
+                            <span 
+                                className="project-name" 
+                                onClick={() => {
+                                    onSelectProject(project)
+                                }}
                             >
                                 {project.name}
                             </span>
@@ -26,11 +53,10 @@ const ProjectSelectorModal = ({ projects, onClose, onSelectProject, createAndSel
                         </li>
                     ))}
                 </ul>
-                <button className="add-project-button" onClick={createAndSelectProject}>
+                <button 
+                    className="add-project-button" 
+                    onClick={createAndSelectProject}>
                     + Crear nuevo proyecto
-                </button>
-                <button className="close-button" onClick={onClose}>
-                    Cerrar
                 </button>
             </div>
         </div>

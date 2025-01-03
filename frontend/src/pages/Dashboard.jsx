@@ -5,6 +5,8 @@ import DaysColumn from '../components/DaysColumn';
 import NavigationArrows from '../components/NavigationArrows';
 import ProjectSelectorModal from '../components/ProjectSelectorModal';
 import SettingsModal from '../components/SettingsModal';
+import CalendarModal from '../components/CalendarModal'; // Modal del calendario
+import { getShareLink } from '../services/projectService'; // Servicio para generar el enlace
 import '../styles/Dashboard.css';
 
 import {
@@ -27,24 +29,40 @@ const Dashboard = () => {
     const [projectId, setProjectId] = useState(null);
     const [projects, setProjects] = useState([]);
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false); // Estado para el modal de configuración
-    const [visibleDaysCount, setVisibleDaysCount] = useState(3); // Controlar días visibles
-    const [currentDate, setCurrentDate] = useState(new Date()); // Día actual
-    const [loadedDates, setLoadedDates] = useState(new Set()); // Fechas ya cargadas
-    const [tasks, setTasks] = useState([]); // Estado de las tareas
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+    const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false); // Estado para Calendar Modal
+    const [shareLink, setShareLink] = useState(''); // Estado para el enlace de compartir
+    const [visibleDaysCount, setVisibleDaysCount] = useState(3);
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const [loadedDates, setLoadedDates] = useState(new Set());
+    const [tasks, setTasks] = useState([]);
 
+    useEffect(() => {
+        // Recuperar el valor guardado en localStorage (si existe) al montar el componente
+        const storedVisibleDaysCount = localStorage.getItem('visibleDaysCount');
+        if (storedVisibleDaysCount) {
+            setVisibleDaysCount(Number(storedVisibleDaysCount)); // Actualiza el estado
+        }
+    }, [setVisibleDaysCount]); // Solo se ejecuta cuando el modal se monta
+    
     const generateVisibleDays = () => {
         const days = [];
-        for (let i = -Math.floor(visibleDaysCount / 2); i <= Math.floor(visibleDaysCount / 2); i++) {
+        // Calcular los días a mostrar a la derecha (y luego calculamos a la izquierda)
+        const halfVisibleDays = Math.floor((visibleDaysCount - 1) / 2);
+    
+        // Día actual a la izquierda y días a la derecha
+        for (let i = 0; i < visibleDaysCount; i++) {
             const date = new Date(currentDate);
-            date.setDate(currentDate.getDate() + i); // Desplazar días
+            date.setDate(currentDate.getDate() + (i - halfVisibleDays)); // i - halfVisibleDays para que el día actual esté a la izquierda
             days.push({
-                name: date.toLocaleDateString('es-ES', { weekday: 'long' }), // Día de la semana
-                date: date.toISOString().split('T')[0], // Usar toISOString para obtener YYYY-MM-DD
+                name: date.toLocaleDateString('es-ES', { weekday: 'long' }),
+                date: date.toISOString().split('T')[0], // YYYY-MM-DD
             });
         }
         return days;
     };
+    
+    
 
     const visibleDays = generateVisibleDays();
 
@@ -56,33 +74,29 @@ const Dashboard = () => {
         setCurrentDate(newDate);
     };
 
-    // Cargar tareas solo para fechas visibles que aún no están cargadas
+    // Cargar tareas solo para fechas visibles
     const loadTasksForVisibleDays = async () => {
         if (!projectId) return;
     
         const datesToLoad = visibleDays
             .map((day) => day.date)
-            .filter((date) => !loadedDates.has(date)); // Fechas aún no cargadas
+            .filter((date) => !loadedDates.has(date)); 
     
-        if (datesToLoad.length === 0) return; // Nada que cargar
+        if (datesToLoad.length === 0) return;
     
         try {
             const allTasks = await getTasksByProject(projectId);
-    
-            // Filtrar tareas por las fechas que necesitamos
             const filteredTasks = allTasks.filter((task) =>
-                datesToLoad.includes(task.date.split('T')[0]) // Asegura el formato correcto
+                datesToLoad.includes(task.date.split('T')[0])
             );
     
-            // Organizar las tareas por fecha
             const tasksGroupedByDate = filteredTasks.reduce((acc, task) => {
-                const taskDate = task.date.split('T')[0]; // Extraer solo la fecha
+                const taskDate = task.date.split('T')[0];
                 if (!acc[taskDate]) acc[taskDate] = [];
                 acc[taskDate].push(task);
                 return acc;
             }, {});
     
-            // Actualizar el estado de tareas y fechas cargadas
             setTasksByDate((prev) => ({ ...prev, ...tasksGroupedByDate }));
             setLoadedDates((prev) => new Set([...prev, ...datesToLoad]));
         } catch (error) {
@@ -90,7 +104,6 @@ const Dashboard = () => {
         }
     };
 
-    // Cargar tareas iniciales y proyectos
     useEffect(() => {
         const loadInitialData = async () => {
             try {
@@ -110,7 +123,6 @@ const Dashboard = () => {
         loadInitialData();
     }, []);
 
-    // Cargar tareas al cambiar `visibleDays` o `projectId`
     useEffect(() => {
         loadTasksForVisibleDays();
     }, [visibleDays, projectId]);
@@ -119,9 +131,42 @@ const Dashboard = () => {
         setCurrentProject(project);
         setProjectName(project.name);
         setProjectId(project.id);
-        setTasks([]); // Limpiar tareas al cambiar de proyecto
-        setLoadedDates(new Set()); // Reiniciar fechas cargadas
+        setTasks([]);
+        setLoadedDates(new Set());
         setIsProjectModalOpen(false);
+    };
+
+    // Función para crear un nuevo proyecto
+    const handleCreateProject = async () => {
+        try {
+            const newProject = {
+                name: 'Nuevo Proyecto', // Aquí puedes colocar el nombre por defecto o permitir que el usuario lo ingrese
+            };
+
+            const createdProject = await createProject(newProject); // Llamada al servicio API para crear el proyecto
+            setProjects([...projects, createdProject]); // Actualiza el estado local con el nuevo proyecto
+            setCurrentProject(createdProject); // Selecciona el proyecto recién creado
+        } catch (error) {
+            console.error('Error al crear el proyecto:', error);
+        }
+    };
+
+    const handleUpdateProjectName = (updatedProject) => {
+        setProjects(prevProjects =>
+            prevProjects.map(project =>
+                project.id === updatedProject.id ? updatedProject : project
+            )
+        );
+    };
+
+    // Función para eliminar un proyecto
+    const handleDeleteProject = async (projectId) => {
+        try {
+            await deleteProject(projectId); // Llamada al servicio API para eliminar el proyecto
+            setProjects(projects.filter((project) => project.id !== projectId)); // Actualiza el estado local eliminando el proyecto
+        } catch (error) {
+            console.error('Error al eliminar el proyecto:', error);
+        }
     };
 
     const handleCreateTask = async (day, date, index, title) => {
@@ -129,15 +174,7 @@ const Dashboard = () => {
             if (!projectId) {
                 throw new Error('No hay un proyecto seleccionado.');
             }
-            // Crear nueva tarea en el backend
-            const newTask = await createTask({
-                date: date, // Aquí usamos el parámetro `day` como la fecha específica
-                index,
-                title,
-                projectId,
-            });
-    
-            // Actualizar el estado local con la nueva tarea
+            const newTask = await createTask({ date, index, title, projectId });
             setTasksByDate((prev) => ({
                 ...prev,
                 [date]: [...(prev[date] || []), newTask],
@@ -177,7 +214,6 @@ const Dashboard = () => {
             if (!taskToDelete) return;
 
             await deleteTask(projectId, taskId);
-            // Actualizar el estado local
             const taskDate = taskToDelete.date.split('T')[0];
             setTasksByDate((prev) => ({
                 ...prev,
@@ -188,9 +224,38 @@ const Dashboard = () => {
         }
     };
 
+    const handleHomeClick = () => {
+        setCurrentDate(new Date()); // Centrar en la fecha actual
+    };
+
+    const handleCalendarClick = () => {
+        setIsCalendarModalOpen(true); // Abrir el modal de calendario
+    };
+
+    const handleShareClick = async () => {
+        try {
+            const link = await getShareLink(projectId); // Obtener el enlace
+            setShareLink(link.share_link);
+            
+            // Copiar el enlace al portapapeles
+            await navigator.clipboard.writeText(link.share_link);
+            
+            // Mostrar una alerta de confirmación
+            alert(`¡Enlace copiado al portapapeles!\n${link.share_link}`);
+        } catch (error) {
+            console.error('Error al obtener o copiar el enlace de compartir:', error);
+            alert('Hubo un problema al copiar el enlace.');
+        }
+    };    
+
     return (
         <div className="dashboard-container">
-            <Sidebar onSettingsClick={() => setIsSettingsModalOpen(true)} />
+            <Sidebar 
+                onSettingsClick={() => setIsSettingsModalOpen(true)} 
+                onHomeClick={handleHomeClick} 
+                onCalendarClick={handleCalendarClick} 
+                onShareClick={handleShareClick} 
+            />
             <div className="dashboard-main">
                 <ProjectHeader
                     projectId={projectId}
@@ -198,6 +263,8 @@ const Dashboard = () => {
                     setProjectName={(newName) => setProjectName(newName)}
                     onMenuClick={() => setIsProjectModalOpen(true)}
                     setProjectId={setProjectId}
+                    setCurrentProject={setCurrentProject}
+                    handleUpdateProjectName={handleUpdateProjectName}
                 />
                 <div className="dashboard-content">
                     <NavigationArrows
@@ -205,16 +272,17 @@ const Dashboard = () => {
                     />
                     <div className="dashboard-columns">
                         {visibleDays.map((day, index) => (
-                           <DaysColumn
+                            <DaysColumn
                                 key={index}
                                 dayName={day.name}
                                 date={day.date}
-                                tasks={tasksByDate[day.date] || []} // Tareas específicas para esta fecha
+                                tasks={tasksByDate[day.date] || []}
                                 maxTasks={20}
                                 onCreateTask={handleCreateTask}
                                 onUpdateTask={handleUpdateTask}
                                 onDeleteTask={handleDeleteTask}
                                 onToggleComplete={handleToggleComplete}
+                                visibleDaysCount={visibleDaysCount}
                             />
                         ))}
                     </div>
@@ -223,8 +291,10 @@ const Dashboard = () => {
             {isProjectModalOpen && (
                 <ProjectSelectorModal
                     projects={projects}
-                    onClose={() => setIsProjectModalOpen(false)}
-                    onSelectProject={handleSelectProject}
+                    onClose={() => setIsProjectModalOpen(false)} // Cerrar el modal
+                    onSelectProject={handleSelectProject} // Seleccionar el proyecto
+                    createAndSelectProject={handleCreateProject} // Crear un proyecto nuevo
+                    onDeleteProject={handleDeleteProject} // Eliminar un proyecto
                 />
             )}
             {isSettingsModalOpen && (
@@ -232,6 +302,13 @@ const Dashboard = () => {
                     visibleDaysCount={visibleDaysCount}
                     setVisibleDaysCount={setVisibleDaysCount}
                     onClose={() => setIsSettingsModalOpen(false)}
+                />
+            )}
+            {isCalendarModalOpen && (
+                <CalendarModal
+                    currentDate={currentDate}
+                    setCurrentDate={setCurrentDate}
+                    onClose={() => setIsCalendarModalOpen(false)}
                 />
             )}
         </div>

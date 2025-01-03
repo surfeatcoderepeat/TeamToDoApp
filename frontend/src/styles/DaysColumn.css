@@ -1,17 +1,20 @@
 .days-column {
     background-color: #2b2b2b;
     border-radius: 30px;
-    padding: 10px;
-    margin: 0 10px;
-    flex: 1;
+    padding: 1px;
+    margin: 0 1px;
+    flex: 1 1 0%;
     display: flex;
     flex-direction: column;
     border-right: 1px solid #444;
+    overflow: hidden; /* Evita el desbordamiento */
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .days-column-header {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .days-column-header h2 {

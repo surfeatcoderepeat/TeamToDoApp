@@ -1,0 +1,107 @@
+/* Fondo del modal */
+.calendar-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Contenido del modal */
+.calendar-modal-content {
+    background-color: #2a2a2a;
+    padding: 20px;
+    border-radius: 10px;
+    width: auto;
+    max-width: 400px;
+    text-align: center;
+    color: white;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Estilo del calendario */
+.custom-calendar {
+    background-color: transparent;
+    border: none;
+    border-radius: 8px;
+    box-shadow: none;
+    margin-bottom: 20px;
+}
+
+/* Estilo de los días del calendario */
+.react-calendar__tile {
+    background-color: #444;
+    color: white;
+    padding: 12px;
+    transition: background-color 0.3s, color 0.3s;
+    cursor: pointer;
+    border-radius: 0%; /* Eliminar el borde redondeado */
+}
+
+/* Hover sobre el día */
+.react-calendar__tile:hover {
+    background-color: #ff9f00; /* Color cuando el mouse pasa por encima */
+    color: white;
+}
+
+/* Día seleccionado */
+.react-calendar__tile--active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Estilo de los botones de navegación */
+.react-calendar__navigation button {
+    background-color: #3a3a3a;
+    color: #f1f1f1;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 0 5px;
+}
+
+.react-calendar__navigation button:hover {
+    background-color: #555;
+}
+
+/* Cerrar el modal al presionar fuera del calendario */
+.calendar-modal-btn {
+    background-color: #4a4a4a;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Botón hover */
+.calendar-modal-btn:hover {
+    background-color: #5a5a5a;
+}
+
+/* Eliminar subrayado de los días de la semana */
+.react-calendar__month-view__weekdays__weekday abbr {
+    text-decoration: none; /* Eliminar el subrayado */
+}
+
+/* Asegúrate de que los días no tengan color ni subrayado */
+.react-calendar__month-view__weekdays__weekday {
+    text-decoration: none; /* Eliminar cualquier subrayado */
+    font-weight: normal; /* Asegurarse de que el texto no esté en negrita */
+}

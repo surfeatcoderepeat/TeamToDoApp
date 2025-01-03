@@ -7,28 +7,64 @@
     cursor: pointer;
     height: 15px;
     margin: 0 10px;
+    position: relative;
 }
 
+/* Ajustamos el tamaño del texto para los elementos */
 .task-item span {
     flex: 1;
     color: #ddd;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
 }
 
 .task-item:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Los botones serán invisibles por defecto y solo aparecerán al pasar el cursor */
+.task-item-buttons {
+    display: flex;  /* Para que los botones estén uno al lado del otro */
+    justify-content: flex-end;  /* Alineación a la derecha */
+    gap: 5px;  /* Espacio entre los botones */
+    position: absolute;  /* Los posiciona sobre el lado derecho */
+    right: 10px;  /* Pegado al borde derecho del contenedor */
+    top: 50%;
+    transform: translateY(-50%);  /* Centrado verticalmente */
+    padding: 0;
+    opacity: 0;  /* Botones invisibles por defecto */
+    transition: opacity 0.3s ease;  /* Animación suave para aparecer */
+}
 
+/* Mostrar los botones cuando el cursor pase por encima del item */
+.task-item:hover .task-item-buttons {
+    opacity: 1;  /* Los botones aparecen al pasar el cursor */
+}
+
+/* Estilos para los botones */
 .task-item-edit,
 .task-item-delete {
     color: #888;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 14px;  /* Reducimos el tamaño de los botones */
+    background-color: transparent; /* Fondo transparente */
+    border: 1px solid transparent;  /* Sin borde o borde transparente */
+    padding: 5px;  /* Espaciado interno para mejorar la interactividad */
+    border-radius: 5px; /* Bordes redondeados para mejorar el diseño */
+    transition: font-size 0.3s ease, background-color 0.3s ease;  /* Animación para el tamaño de los botones */
+    display: flex;
+    align-items: center; /* Centrado verticalmente */
+    justify-content: center; /* Centrado horizontalmente */
+    width: 25px; /* Fijar un ancho específico */
+    height: 25px; /* Fijar una altura específica */
 }
 
 .task-item-edit:hover,
 .task-item-delete:hover {
     color: #fff;
+    font-size: 18px;  /* Aumentamos ligeramente el tamaño al pasar el cursor */
+    background-color: rgba(255, 255, 255, 0.2);  /* Fondo ligeramente visible al pasar el cursor */
 }
 
 .task-text {
@@ -37,21 +73,21 @@
 }
 
 .task-item input {
-    border: none; /* Elimina el borde */
-    background: transparent; /* Fondo transparente */
-    color: inherit; /* Usa el color del texto del contenedor */
-    width: 100%; /* Asegura que ocupe todo el espacio disponible */
-    font-size: inherit; /* Hereda el tamaño de fuente del contenedor */
-    font-family: inherit; /* Hereda la fuente del contenedor */
-    outline: none; /* Elimina el borde azul al enfocar */
-    padding: 0; /* Elimina el relleno */
+    border: none;
+    background: transparent;
+    color: inherit;
+    width: 100%;
+    font-size: inherit;
+    font-family: inherit;
+    outline: none;
+    padding: 0;
 }
 
 .task-item.completed .task-item-placeholder {
     text-decoration: line-through;
-    color: #aaa; /* Color desvanecido para indicar completado */
+    color: #aaa;
 }
 
 .task-item-placeholder {
-    cursor: pointer; /* Indica que es interactivo */
+    cursor: pointer;
 }

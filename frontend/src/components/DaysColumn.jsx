@@ -6,14 +6,15 @@ import { es } from 'date-fns/locale';
 import { formatDateToLocal } from '../utils/dateUtils';
 
 
-const DaysColumn = ({ dayName, date, tasks = [], maxTasks = 20, onCreateTask, onUpdateTask, onDeleteTask, onToggleComplete }) => {
+const DaysColumn = ({ dayName, date, tasks = [], maxTasks = 20, onCreateTask, onUpdateTask, onDeleteTask, onToggleComplete, visibleDaysCount }) => {
     // Crear líneas vacías si no hay suficientes tareas
     const totalLines = Array.from({ length: maxTasks }, (_, index) => {
         return tasks[index] || { id: null, title: '', day: dayName }; // Si no hay tarea, añade una vacía
     });
-
+    // Calcular el ancho de la columna en función de visibleDaysCount
+    const columnWidth = `${100 / visibleDaysCount}%`;
     return (
-        <div className="days-column">
+        <div className="days-column" >
             {/* Encabezado de la columna */}
             <div className="days-column-header">
                 <h2>{dayName}</h2>
