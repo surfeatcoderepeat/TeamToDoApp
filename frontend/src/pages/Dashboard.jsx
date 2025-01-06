@@ -23,19 +23,23 @@ import {
 } from '../services/taskService';
 
 const Dashboard = () => {
+    // Estados de proyectos
     const [projectName, setProjectName] = useState('Nuevo Proyecto');
-    const [tasksByDate, setTasksByDate] = useState({});
     const [currentProject, setCurrentProject] = useState(null);
     const [projectId, setProjectId] = useState(null);
     const [projects, setProjects] = useState([]);
+    // Estados de tareas
+    const [tasksByDate, setTasksByDate] = useState({});
+    // Estados de modales
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-    const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false); // Estado para Calendar Modal
-    const [shareLink, setShareLink] = useState(''); // Estado para el enlace de compartir
+    const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
+    // Otros estados
+    const [shareLink, setShareLink] = useState(''); 
     const [visibleDaysCount, setVisibleDaysCount] = useState(3);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [loadedDates, setLoadedDates] = useState(new Set());
-    const [tasks, setTasks] = useState([]);
+    
 
     useEffect(() => {
         // Recuperar el valor guardado en localStorage (si existe) al montar el componente
@@ -131,7 +135,7 @@ const Dashboard = () => {
         setCurrentProject(project);
         setProjectName(project.name);
         setProjectId(project.id);
-        setTasks([]);
+        setTasksByDate([]);
         setLoadedDates(new Set());
         setIsProjectModalOpen(false);
     };
@@ -149,14 +153,6 @@ const Dashboard = () => {
         } catch (error) {
             console.error('Error al crear el proyecto:', error);
         }
-    };
-
-    const handleUpdateProjectName = (updatedProject) => {
-        setProjects(prevProjects =>
-            prevProjects.map(project =>
-                project.id === updatedProject.id ? updatedProject : project
-            )
-        );
     };
 
     // Función para eliminar un proyecto
@@ -264,7 +260,7 @@ const Dashboard = () => {
                     onMenuClick={() => setIsProjectModalOpen(true)}
                     setProjectId={setProjectId}
                     setCurrentProject={setCurrentProject}
-                    handleUpdateProjectName={handleUpdateProjectName}
+                    setProjects={setProjects}
                 />
                 <div className="dashboard-content">
                     <NavigationArrows

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/ProjectHeader.css';
 import { patchProject, createProject } from '../services/projectService';
 
-const ProjectHeader = ({ projectId, projectName, setProjectId, setProjectName, onMenuClick, setCurrentProject, handleUpdateProjectName }) => {
+const ProjectHeader = ({ projectId, projectName, setProjectId, setProjectName, onMenuClick, setCurrentProject, setProjects }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [newProjectName, setNewProjectName] = useState(projectName || 'Nuevo Proyecto');
     const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +30,11 @@ const ProjectHeader = ({ projectId, projectName, setProjectId, setProjectName, o
                     const updatedProject = await patchProject(projectId, { name: newProjectName });
                     setProjectName(updatedProject.name); // Asegurarse de actualizar el nombre
                     setCurrentProject(updatedProject.name);
-                    handleUpdateProjectName(updatedProject.name)
+                    setProjects(prevProjects =>
+                        prevProjects.map(project =>
+                            project.id === updatedProject.id ? updatedProject : project
+                        )
+                    );
                 } else {
                     // Si no existe, preguntar al usuario si desea crearlo
                     const confirmCreate = window.confirm(
@@ -40,6 +44,7 @@ const ProjectHeader = ({ projectId, projectName, setProjectId, setProjectName, o
                         const createdProject = await createProject({ name: newProjectName });
                         setProjectId(createdProject.id);
                         setProjectName(createdProject.name); // Actualizar con el nombre real desde la respuesta
+                        setProjects(prevProjects => [...prevProjects, newProject]);
                         console.log('Nuevo proyecto creado:', createdProject);
                     } else {
                         setNewProjectName(projectName); // Restablecer si cancela
