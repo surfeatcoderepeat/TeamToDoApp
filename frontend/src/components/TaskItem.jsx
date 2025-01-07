@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/TaskItem.css';
 
-const TaskItem = ({ task = {}, onCreateTask, onUpdateTask, onDeleteTask, onToggleComplete, day, date, index }) => {
+const TaskItem = ({ 
+    task = {}, 
+    onCreateTask, 
+    onUpdateTask, 
+    onDeleteTask, 
+    onToggleComplete, 
+    day, 
+    date, 
+    index, 
+    onFocusNextTask, 
+    onFocusTaskInNextColumn 
+}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [title, setTitle] = useState(task.title || '');
     const [isCompleted, setIsCompleted] = useState(task.completed || false);
@@ -17,7 +28,7 @@ const TaskItem = ({ task = {}, onCreateTask, onUpdateTask, onDeleteTask, onToggl
         const trimmedTitle = title.trim();
         if (trimmedTitle) {
             if (task.id) {
-                onUpdateTask(task.id, {title: trimmedTitle}); // Actualizar tarea existente
+                onUpdateTask(task.id, { title: trimmedTitle }); // Actualizar tarea existente
             } else {
                 onCreateTask(day, date, index, trimmedTitle); // Crear nueva tarea
             }
@@ -53,6 +64,24 @@ const TaskItem = ({ task = {}, onCreateTask, onUpdateTask, onDeleteTask, onToggl
         }
     };
 
+    // Manejar teclas especiales
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSave();
+            if (onFocusNextTask) {
+                onFocusNextTask(index + 1); // Focalizar tarea inferior
+            }
+        } else if (e.key === 'Tab') {
+            e.preventDefault(); // Evitar comportamiento por defecto del navegador
+            handleSave();
+            if (onFocusTaskInNextColumn) {
+                onFocusTaskInNextColumn(date); // Crear tarea en la columna contigua
+            }
+        } else if (e.key === 'Escape') {
+            setIsEditing(false); // Cancelar edición
+        }
+    };
+
     // Renderizado del componente
     return (
         <div
@@ -69,10 +98,7 @@ const TaskItem = ({ task = {}, onCreateTask, onUpdateTask, onDeleteTask, onToggl
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     onBlur={handleSave} // Guardar al perder el foco
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSave();
-                        if (e.key === 'Escape') setIsEditing(false);
-                    }}
+                    onKeyDown={handleKeyDown} // Manejar teclas especiales
                     className="task-item-input"
                     autoFocus
                 />

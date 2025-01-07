@@ -340,6 +340,32 @@ const Dashboard = () => {
           return updatedTasksByDate;
         });
       };
+
+      const handleFocusTaskInNextColumn = (currentDate) => {      
+        const visibleDates = visibleDays.map((day) => day.date);
+        const currentIndex = visibleDates.indexOf(currentDate);
+        const nextIndex = currentIndex + 1;
+      
+        if (nextIndex < visibleDates.length) {
+          const nextDate = visibleDates[nextIndex];
+      
+          setTimeout(() => {
+            const firstPlaceholderSpan = document.querySelector(
+              `.days-column[data-date="${nextDate}"] .days-column-tasks span.task-item-placeholder.empty-task`
+            );
+      
+            if (firstPlaceholderSpan) {
+      
+              // Simula un clic en el span
+              firstPlaceholderSpan.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+            } else {
+              console.error("No placeholder span found in next column for date:", nextDate);
+            }
+          }, 0);
+        } else {
+          console.warn("No next column available. Current date:", currentDate);
+        }
+      };
   
 
     return (
@@ -367,16 +393,17 @@ const Dashboard = () => {
                         <div className="dashboard-columns">
                         {visibleDays.map((day) => (
                             <DaysColumn
-                            key={day.date}         // Usar la fecha como key para evitar conflictos
-                            dayName={day.name}
-                            date={day.date}
-                            tasks={tasksByDate[day.date] || []}
-                            maxTasks={20}
-                            onCreateTask={handleCreateTask}
-                            onUpdateTask={handleUpdateTask}
-                            onDeleteTask={handleDeleteTask}
-                            onToggleComplete={handleToggleComplete}
-                            visibleDaysCount={visibleDaysCount}
+                                key={day.date}         // Usar la fecha como key para evitar conflictos
+                                dayName={day.name}
+                                date={day.date}
+                                tasks={tasksByDate[day.date] || []}
+                                maxTasks={20}
+                                onCreateTask={handleCreateTask}
+                                onUpdateTask={handleUpdateTask}
+                                onDeleteTask={handleDeleteTask}
+                                onToggleComplete={handleToggleComplete}
+                                visibleDaysCount={visibleDaysCount}
+                                onFocusTaskInNextColumn={handleFocusTaskInNextColumn}
                             />
                         ))}
                         </div>
