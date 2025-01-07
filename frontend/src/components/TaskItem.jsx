@@ -17,7 +17,7 @@ const TaskItem = ({ task = {}, onCreateTask, onUpdateTask, onDeleteTask, onToggl
         const trimmedTitle = title.trim();
         if (trimmedTitle) {
             if (task.id) {
-                onUpdateTask(task.id, trimmedTitle); // Actualizar tarea existente
+                onUpdateTask(task.id, {title: trimmedTitle}); // Actualizar tarea existente
             } else {
                 onCreateTask(day, date, index, trimmedTitle); // Crear nueva tarea
             }

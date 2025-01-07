@@ -1,3 +1,4 @@
+/* ======= BLOQUE 1 (IMPORTS) ======= */
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/SideBar';
 import ProjectHeader from '../components/ProjectHeader';
@@ -8,18 +9,19 @@ import SettingsModal from '../components/SettingsModal';
 import CalendarModal from '../components/CalendarModal'; // Modal del calendario
 import { getShareLink } from '../services/projectService'; // Servicio para generar el enlace
 import '../styles/Dashboard.css';
+import { DragDropContext } from '@hello-pangea/dnd';
 
 import {
-    getProjects,
-    createProject,
-    deleteProject,
+  getProjects,
+  createProject,
+  deleteProject,
 } from '../services/projectService';
 import {
-    getTasksByProject,
-    createTask,
-    updateTask,
-    deleteTask,
-    patchTask,
+  getTasksByProject,
+  createTask,
+  updateTask,
+  deleteTask,
+  patchTask,
 } from '../services/taskService';
 
 const Dashboard = () => {
@@ -182,25 +184,50 @@ const Dashboard = () => {
 
     const handleUpdateTask = async (taskId, data) => {
         try {
-            const updatedTask = await updateTask(projectId, taskId, data);
-            setTasks((prev) =>
-                prev.map((task) => (task.id === taskId ? updatedTask : task))
-            );
+          // Actualizamos la tarea en el backend
+          const updatedTask = await updateTask(projectId, taskId, data);
+      
+          // Actualizamos el estado local
+          setTasksByDate((prev) => {
+            // Creamos una copia del estado actual
+            const updatedTasksByDate = { ...prev };
+      
+            // Iteramos sobre las fechas para buscar la tarea a actualizar
+            for (const date in updatedTasksByDate) {
+              // Si la tarea existe en esta fecha
+              updatedTasksByDate[date] = updatedTasksByDate[date].map((task) =>
+                task.id === taskId ? updatedTask : task
+              );
+            }
+      
+            return updatedTasksByDate;
+          });
         } catch (error) {
-            console.error('Error al actualizar la tarea:', error);
+          console.error("Error al actualizar la tarea:", error);
         }
-    };
+      };
 
     const handleToggleComplete = async (taskId, completed) => {
         try {
+            // Actualizar la tarea en el backend
             const updatedTask = await patchTask(projectId, taskId, { completed });
-            setTasks((prev) =>
-                prev.map((task) =>
-                    task.id === taskId ? { ...task, completed: updatedTask.completed } : task
-                )
-            );
+    
+            // Actualizar el estado local de tasksByDate
+            setTasksByDate((prev) => {
+                // Crear una copia inmutable del estado anterior
+                const updatedTasksByDate = { ...prev };
+    
+                // Iterar sobre las fechas y modificar la tarea específica
+                for (const date in updatedTasksByDate) {
+                    updatedTasksByDate[date] = updatedTasksByDate[date].map((task) =>
+                        task.id === taskId ? { ...task, completed: updatedTask.completed } : task
+                    );
+                }
+    
+                return updatedTasksByDate; // Retornar el nuevo estado
+            });
         } catch (error) {
-            console.error('Error al actualizar el estado de completado:', error);
+            console.error("Error al actualizar el estado de completado:", error);
         }
     };
 
@@ -244,6 +271,77 @@ const Dashboard = () => {
         }
     };    
 
+    const handleDragEnd = async (result) => {
+        const { source, destination, draggableId } = result;
+      
+        // 1. Si no hay destino o la posición no cambia, no hacemos nada
+        if (
+          !destination ||
+          (destination.droppableId === source.droppableId &&
+            destination.index === source.index)
+        ) {
+          return;
+        }
+      
+        // Columnas (fechas) de origen y destino
+        const sourceDate = source.droppableId; // Fecha de origen
+        const destDate = destination.droppableId; // Fecha de destino
+      
+        // Si no existe la lista de origen, salimos
+        if (!tasksByDate[sourceDate]) {
+          return;
+        }
+      
+        // 2. Copiamos las tareas de la columna de origen
+        const sourceTasks = tasksByDate[sourceDate];
+      
+        // 3. Si la tarea se mueve dentro de la misma columna
+        if (sourceDate === destDate) {
+          const reorderedTasks = Array.from(sourceTasks); // Creamos una copia del arreglo
+          const [movedTask] = reorderedTasks.splice(source.index, 1); // Quitamos la tarea de su posición original
+          reorderedTasks.splice(destination.index, 0, movedTask); // Insertamos la tarea en su nueva posición
+      
+          // Actualizamos solo la columna afectada en el estado
+          setTasksByDate((prev) => ({
+            ...prev,
+            [sourceDate]: reorderedTasks, // Actualizamos solo esta columna
+          }));
+          return;
+        }
+      
+        // 4. Si la tarea cambia de columna (entre fechas)
+        const destTasks = tasksByDate[destDate] || []; // Tareas de destino o arreglo vacío si no existe
+      
+        // Copias inmutables de las listas de tareas
+        const updatedSourceTasks = Array.from(sourceTasks);
+        const updatedDestTasks = Array.from(destTasks);
+      
+        // Quitamos la tarea del origen
+        const [movedTask] = updatedSourceTasks.splice(source.index, 1);
+      
+        // Actualizamos la fecha de la tarea
+        movedTask.date = destDate;
+      
+        // Insertamos la tarea en la nueva columna
+        updatedDestTasks.splice(destination.index, 0, movedTask);
+      
+        // Sincronizamos con el backend para reflejar el cambio de fecha
+        try {
+          await patchTask(projectId, movedTask.id, { date: destDate });
+        } catch (error) {
+          console.error("Error actualizando fecha de la tarea:", error);
+        }
+      
+        // Actualizamos solo las columnas afectadas en el estado
+        setTasksByDate((prev) => {
+          const updatedTasksByDate = { ...prev };
+          updatedTasksByDate[sourceDate] = updatedSourceTasks; // Actualizamos la columna de origen
+          updatedTasksByDate[destDate] = updatedDestTasks; // Actualizamos la columna de destino
+          return updatedTasksByDate;
+        });
+      };
+  
+
     return (
         <div className="dashboard-container">
             <Sidebar 
@@ -263,25 +361,26 @@ const Dashboard = () => {
                     setProjects={setProjects}
                 />
                 <div className="dashboard-content">
-                    <NavigationArrows
-                        onNavigate={(direction) => handleNavigate(direction)}
-                    />
-                    <div className="dashboard-columns">
-                        {visibleDays.map((day, index) => (
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                        <NavigationArrows onNavigate={(direction) => handleNavigate(direction)} />
+
+                        <div className="dashboard-columns">
+                        {visibleDays.map((day) => (
                             <DaysColumn
-                                key={index}
-                                dayName={day.name}
-                                date={day.date}
-                                tasks={tasksByDate[day.date] || []}
-                                maxTasks={20}
-                                onCreateTask={handleCreateTask}
-                                onUpdateTask={handleUpdateTask}
-                                onDeleteTask={handleDeleteTask}
-                                onToggleComplete={handleToggleComplete}
-                                visibleDaysCount={visibleDaysCount}
+                            key={day.date}         // Usar la fecha como key para evitar conflictos
+                            dayName={day.name}
+                            date={day.date}
+                            tasks={tasksByDate[day.date] || []}
+                            maxTasks={20}
+                            onCreateTask={handleCreateTask}
+                            onUpdateTask={handleUpdateTask}
+                            onDeleteTask={handleDeleteTask}
+                            onToggleComplete={handleToggleComplete}
+                            visibleDaysCount={visibleDaysCount}
                             />
                         ))}
-                    </div>
+                        </div>
+                    </DragDropContext>
                 </div>
             </div>
             {isProjectModalOpen && (
