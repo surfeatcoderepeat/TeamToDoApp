@@ -30,9 +30,7 @@ const DaysColumn = ({
          `.days-column[data-date="${date}"] .days-column-tasks [data-task-index="${taskIndex}"] span`
       );
   
-    if (inputToFocus) {
-      console.log("Found element to focus:", inputToFocus);
-  
+    if (inputToFocus) {  
       if (inputToFocus.tagName === "SPAN") {
         inputToFocus.click(); // Simula un clic para activar la edición
       } else if (inputToFocus.tagName === "INPUT") {

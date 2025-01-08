@@ -11,9 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-aspu6ki+%^2mx9%roygpx&*z=)w2^l30p9+^yq_*#@s-&xrn5m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
 # Application definition
 
@@ -134,7 +135,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -145,8 +147,7 @@ import os
 import json
 
 # Credenciales de Google OAuth2
-BASE_DIR = Path(__file__).resolve().parent.parent
-CREDENTIALS_FILE = os.path.join(BASE_DIR, 'backend/credentials', 'google_auth.json')
+CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials', 'google_auth.json')
 
 with open(CREDENTIALS_FILE, 'r') as file:
     credentials = json.load(file)

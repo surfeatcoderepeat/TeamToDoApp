@@ -44,8 +44,7 @@ const ProjectHeader = ({ projectId, projectName, setProjectId, setProjectName, o
                         const createdProject = await createProject({ name: newProjectName });
                         setProjectId(createdProject.id);
                         setProjectName(createdProject.name); // Actualizar con el nombre real desde la respuesta
-                        setProjects(prevProjects => [...prevProjects, newProject]);
-                        console.log('Nuevo proyecto creado:', createdProject);
+                        setProjects(prevProjects => [...prevProjects, createdProject]);
                     } else {
                         setNewProjectName(projectName); // Restablecer si cancela
                     }

@@ -158,10 +158,22 @@ const Dashboard = () => {
     };
 
     // Función para eliminar un proyecto
-    const handleDeleteProject = async (projectId) => {
+    const handleDeleteProject = async (projectIdToDelete) => {
         try {
-            await deleteProject(projectId); // Llamada al servicio API para eliminar el proyecto
-            setProjects(projects.filter((project) => project.id !== projectId)); // Actualiza el estado local eliminando el proyecto
+            await deleteProject(projectIdToDelete); // Llamada al servicio API para eliminar el proyecto
+            
+            const updatedProjects = projects.filter((project) => project.id !== projectIdToDelete); // Actualiza la lista de proyectos
+            
+            setProjects(updatedProjects);
+    
+            // Si el proyecto eliminado es el actual o si ya no hay proyectos
+            if (currentProject?.id === projectIdToDelete || updatedProjects.length === 0) {
+                setCurrentProject(null); // Restablecer el proyecto actual
+                setProjectName('Nuevo Proyecto'); // Nombre inicial
+                setProjectId(null); // Sin ID de proyecto
+                setTasksByDate({});
+                setLoadedDates(new set());
+            }
         } catch (error) {
             console.error('Error al eliminar el proyecto:', error);
         }
@@ -170,6 +182,7 @@ const Dashboard = () => {
     const handleCreateTask = async (day, date, index, title) => {
         try {
             if (!projectId) {
+                alert('Asigna un nombre al proyecto para comenzar!')
                 throw new Error('No hay un proyecto seleccionado.');
             }
             const newTask = await createTask({ date, index, title, projectId });
