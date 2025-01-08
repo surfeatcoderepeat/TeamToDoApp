@@ -75,7 +75,7 @@ class ShareProject(APIView):
     def get(self, request, project_pk):
         project = get_object_or_404(Project, pk=project_pk, users=request.user)
         share_token, created = ShareToken.objects.get_or_create(project=project)
-        share_link = f"{request.scheme}://{request.get_host()}/api/join-project/{share_token.token}/"
+        share_link = f"{request.scheme}://localhost:5173/join-project/{share_token.token}/"
         return Response({'share_link': share_link}, status=status.HTTP_200_OK)
     
 class JoinProject(APIView):
@@ -93,37 +93,47 @@ class JoinProject(APIView):
             return Response({'error': 'Proyecto no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
         user = request.user
         if user in project.users.all():
-            return Response({'message': 'Ya eres parte de este proyecto'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Ya eres parte de este proyecto'}, status=status.HTTP_200_OK)
         project.users.add(user)
+                # Verifica si el usuario está realmente en la lista de usuarios del proyecto
+        if user in project.users.all():
+            print(f"Usuario {user.username} agregado correctamente al proyecto {project.name}.")
+        else:
+            print(f"Error: Usuario {user.username} no fue agregado al proyecto {project.name}.")
         return Response({'message': 'Te uniste al proyecto exitosamente'}, status=status.HTTP_200_OK)
     
 class ManageParticipants(APIView):
     """
     Vista para agregar o eliminar un participante de un proyecto
     """
-    def post(self, request, project_pk):
+    def post(self, request, project_pk, user_pk):
         """Agregar un participante al proyecto"""
+        # Verifica que el proyecto exista y que el usuario que realiza la solicitud sea participante del proyecto
         project = get_object_or_404(Project, pk=project_pk, users=request.user)
-        if not project:
-            return Response({'error': 'Proyecto no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
-        user_id = request.data.get('user_id')
-        if not user_id:
-            return Response({'error': 'Falta el ID del usuario'})
-        user = get_object_or_404(User, pk=user_id)
+
+        # Obtén el usuario que se va a agregar al proyecto
+        user = get_object_or_404(User, pk=user_pk)
+
+        # Verifica si el usuario ya pertenece al proyecto
+        if user in project.users.all():
+            return Response({'message': 'El usuario ya es parte del proyecto'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Agrega el usuario al proyecto
         project.users.add(user)
-        return Response({'message': 'Usuario agregado exitosamente'})
+        return Response({'message': 'Usuario agregado exitosamente'}, status=status.HTTP_200_OK)
     
-    def delete(self, request, project_pk):
+    def delete(self, request, project_pk, user_pk):
         """Eliminar un participante"""
-        project = get_object_or_404(Project, pk=project_pk, users=request.user)
-        if not project:
-            return Response({'error': 'Proyecto no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
-        user_id = request.data.get('user_id')
-        if not user_id:
-            return Response({'error': 'Falta el ID del usuario'})
-        user = get_object_or_404(User, pk=user_id)
-        project.users.remove(user)
-        return Response({'message': 'Usuario eliminado exitosamente'})
+        # Verifica que el proyecto exista y que el usuario sea participante
+        project = get_object_or_404(Project, pk=project_pk)
+        user = get_object_or_404(User, pk=user_pk)
+
+        # Elimina al usuario del proyecto
+        if user in project.users.all():
+            project.users.remove(user)
+            return Response({'message': 'Usuario eliminado exitosamente'})
+        else:
+            return Response({'error': 'El usuario no pertenece a este proyecto'}, status=status.HTTP_400_BAD_REQUEST)
 
 class TaskList(APIView):
     """

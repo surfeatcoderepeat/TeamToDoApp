@@ -6,7 +6,7 @@ urlpatterns = [
     path('projects/<int:project_pk>/', ProjectDetail.as_view(), name='project-detail'),
     path('projects/<int:project_pk>/share/', ShareProject.as_view(), name='share-project'),
     path('join-project/<uuid:token>/', JoinProject.as_view(), name='join-project'),
-    path('projects/<int:project_pk>/participants/', ManageParticipants.as_view(), name='manage-participants'),
+    path('projects/<int:project_pk>/participants/<int:user_pk>/', ManageParticipants.as_view(), name='manage-participants'),
     path('projects/<int:project_pk>/tasks/', TaskList.as_view(), name='task-list'),
     path('projects/<int:project_pk>/tasks/<int:task_pk>/', TaskDetail.as_view(), name='task-detail'),
 ]
