@@ -26,7 +26,7 @@ const GoogleLoginButton = () => {
     };
 
     return (
-        <GoogleOAuthProvider clientId="816826852902-a10ito02dqmq3t0puam0aaj4h285kilp.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId={import.meta.env.REACT_APP_GOOGLE_CLIENT_ID}>
             <GoogleLogin
                 onSuccess={handleSuccess}
                 onError={handleFailure}

@@ -1,66 +1,71 @@
-
-
 import axios from 'axios';
 
 // Crear una instancia de axios con la configuración base
 const api = axios.create({
-    baseURL: 'http://127.0.0.1:8000', // Cambia si el backend está en otra URL
+    baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000', // Usa REACT_APP_BACKEND_URL si está definida
+    timeout: 10000, // Tiempo de espera (10 segundos)
+    headers: {
+        'Content-Type': 'application/json', // Asegura el tipo de contenido por defecto
+    },
 });
+
+// Función para limpiar tokens y redirigir al login
+const clearTokensAndRedirect = () => {
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    window.location.href = '/'; // Redirigir al login
+};
 
 // Interceptor de solicitudes: Agregar el access token al encabezado Authorization
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('access');
-        
-        // Agregar el token al encabezado si existe
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
-        } else {
-            console.log("No se encontró un token de acceso en localStorage.");
         }
-
         return config;
     },
-    (error) => Promise.reject(error) // Manejar errores en las solicitudes
+    (error) => {
+        console.error('Error en la solicitud:', error);
+        return Promise.reject(error);
+    }
 );
 
 // Interceptor de respuestas: Manejar el refresco del token si el servidor responde con un 401
 api.interceptors.response.use(
-    (response) => response, // Pasar las respuestas exitosas directamente
+    (response) => response, // Devolver la respuesta directamente si no hay errores
     async (error) => {
         if (error.response?.status === 401) {
-            console.log("Token expirado. Intentando refrescar...");
-
+            console.log('Token expirado. Intentando refrescar...');
             const refreshToken = localStorage.getItem('refresh');
+
             if (refreshToken) {
                 try {
-                    // Solicitar un nuevo access token al backend
-                    const refreshResponse = await axios.post('http://127.0.0.1:8000/auth/token/refresh/', {
+                    // Intentar refrescar el token
+                    const refreshResponse = await api.post('/auth/token/refresh/', {
                         refresh: refreshToken,
                     });
                     const newAccessToken = refreshResponse.data.access;
-                    console.log("New access token:", newAccessToken)
 
-                    // Guardar el nuevo token en localStorage
+                    // Actualizar el token de acceso en localStorage
                     localStorage.setItem('access', newAccessToken);
 
                     // Reintentar la solicitud original con el nuevo token
                     error.config.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                    return axios.request(error.config);
+                    return api.request(error.config);
                 } catch (refreshError) {
-                    console.error("Error al refrescar el token:", refreshError);
-                    // Si el refresh también falla, redirigir al login
-                    // Limpia el almacenamiento local si no se puede refrescar el token
-                localStorage.removeItem('access');
-                localStorage.removeItem('refresh');
-                window.location.href = '/'; // Redirige al inicio de sesión
+                    console.error('Error al refrescar el token:', refreshError);
+                    clearTokensAndRedirect();
                 }
             } else {
-                console.log("No se encontró refresh token. Redirigiendo al login.");
-                window.location.href = '/';
+                console.warn('No se encontró refresh token. Redirigiendo al login.');
+                clearTokensAndRedirect();
             }
         }
-        return Promise.reject(error); // Pasar otros errores sin procesar
+
+        // Manejar otros errores de forma genérica
+        console.error('Error en la respuesta del servidor:', error.response?.data || error.message);
+        return Promise.reject(error);
     }
 );
 

@@ -1,6 +1,6 @@
 /* ======= BLOQUE 1 (IMPORTS) ======= */
 import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/SideBar';
+import Sidebar from '../components/Sidebar';
 import ProjectHeader from '../components/ProjectHeader';
 import DaysColumn from '../components/DaysColumn';
 import NavigationArrows from '../components/NavigationArrows';

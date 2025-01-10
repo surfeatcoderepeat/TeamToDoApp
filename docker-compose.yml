@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Dockerfile para NGINX en la raíz del proyecto
+    ports:
+      - "80:80"  # Exponer NGINX en el puerto 80
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: ./backend  # Ruta del backend Django
+      dockerfile: Dockerfile  # Dockerfile para Django
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app  # Sincroniza el código del host con el contenedor
+    ports:
+      - "8000:8000"  # Exponer el backend en el puerto 8000 (solo en desarrollo)
+    networks:
+      - app_network
+
+  frontend:
+    build:
+      context: ./frontend  # Ruta del frontend React
+      dockerfile: Dockerfile  # Dockerfile para React
+    volumes:
+      - ./frontend:/app
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

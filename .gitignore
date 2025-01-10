@@ -10,6 +10,8 @@ __pycache__/
 # Archivos de Django
 /static/
 media/
+staticfiles/
+backend/cache/
 
 # Archivos de logs
 *.log
@@ -32,3 +34,10 @@ pip-delete-this-directory.txt
 
 # Credenciales
 backend/credentials/
+
+# Backups y temporales
+*.bak
+*.tmp
+
+# Documentación generada
+docs/
