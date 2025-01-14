@@ -1,10 +1,6 @@
 from pathlib import Path
 import os
 import dj_database_url
-from dotenv import load_dotenv
-
-# Cargar variables de entorno
-load_dotenv()
 
 # Base path
 BASE_DIR = Path(__file__).resolve().parent
@@ -17,24 +13,18 @@ DEBUG = os.getenv('DEBUG')
 
 # Hosts permitidos
 ALLOWED_HOSTS = [
-    '127.0.0.1',
     'localhost',
-    'teamtodoapp-backend-production.up.railway.app',
     'teamtodoapp-frontend-production.up.railway.app',
 ]
 
 # Configuración de CORS
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # URL del frontend en local
-    "http://127.0.0.1:3000",
-    'http://localhost:5173',
-    'https://teamtodoapp-backend-production.up.railway.app',
+    "http://localhost",
     "https://teamtodoapp-frontend-production.up.railway.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:5173',
-    'https://teamtodoapp-backend-production.up.railway.app',
+    'http://localhost',
     "https://teamtodoapp-frontend-production.up.railway.app",
 ]
 

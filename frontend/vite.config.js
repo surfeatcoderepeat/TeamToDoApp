@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/': {
-        target: process.env.VITE_BACKEND_URL || 'http://localhost:8000', // Usa la variable de entorno o un valor por defecto
+        target: process.env.VITE_BACKEND_URL,
         changeOrigin: true,
         secure: false,
       },

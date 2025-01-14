@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.permissions import IsAuthenticated
+import os
 
 
 class GoogleLoginView(APIView):
@@ -30,12 +31,15 @@ class GoogleLoginView(APIView):
         try:
             # Verificar el token usando las librerías de Google
             idinfo = id_token.verify_oauth2_token(
-                token, google_requests.Request(), "816826852902-a10ito02dqmq3t0puam0aaj4h285kilp.apps.googleusercontent.com"
+                token, 
+                google_requests.Request(), 
+                os.getenv('GOOGLE_CLIENT_ID')
             )
         except ValueError:
             # El token no es válido
             return Response(
-                {"error": "Token inválido"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Token inválido"}, 
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         # Extraer información del usuario desde el token
