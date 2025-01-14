@@ -1,5 +1,5 @@
 # Usa Python 3.11 como base
-FROM python:3.11-slim
+FROM --platform=linux/amd64 python:3.11-slim
 
 # Establece el directorio de trabajo
 WORKDIR /app
@@ -9,15 +9,11 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copia el código del backend
+# Copia el código fuente del backend
 COPY . .
 
-# Ejecuta tareas necesarias antes de iniciar la aplicación
-RUN python manage.py collectstatic --noinput && \
-    python manage.py migrate
-
-# Exponer el puerto dinámico
+# Expone el puerto dinámico para Railway
 EXPOSE 8000
 
-# Comando para ejecutar la aplicación
-CMD ["sh", "-c", "python manage.py runserver 0.0.0.0:8000"]
+# Comando para producción: Ejecuta Gunicorn
+CMD ["gunicorn", "--bind", "[::]:8000", "wsgi:application"]

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Crear una instancia de axios con la configuración base
 const api = axios.create({
-    baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000', // Usa REACT_APP_BACKEND_URL si está definida
+    baseURL: import.meta.env.VITE_BACKEND_URL, // Usa REACT_APP_BACKEND_URL si está definida
     timeout: 10000, // Tiempo de espera (10 segundos)
     headers: {
         'Content-Type': 'application/json', // Asegura el tipo de contenido por defecto

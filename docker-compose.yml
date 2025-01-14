@@ -1,35 +1,21 @@
 services:
-  nginx:
-    image: tinchopipa/teamtodoapp-nginx:latest
-    ports:
-      - "80:80"  # Exponer Nginx públicamente en el puerto 80
-    depends_on:
-      - backend
-      - frontend
-    networks:
-      - app_network
-    environment:
-      - BACKEND_URL=http://backend:8000  # Enlace local al backend
-
-  backend:
-    image: tinchopipa/teamtodoapp-backend:latest
-    command: python manage.py runserver 0.0.0.0:8000  # Escucha en IPv4 para local
-    ports:
-      - "8000:8000"  # Exponer el backend en el puerto 8000 para local
-    env_file:
-      - .env  # Cargar variables del archivo .env
-    networks:
-      - app_network
-
   frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: tinchopipa/teamtodoapp-frontend:latest
     ports:
-      - "3000:3000"  # Exponer el frontend en el puerto 3000 para pruebas locales
-    networks:
-      - app_network
+      - "80:80"  
     environment:
-      - VITE_BACKEND_URL=http://nginx:80  # Conectar a Nginx para pruebas locales
+      - VITE_BACKEND_URL=${BACKEND_URL}
+      - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+    restart: always
 
-networks:
-  app_network:
-    driver: bridge
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: tinchopipa/teamtodoapp-backend:latest
+    ports:
+      - "8000:8000"
+    restart: always
