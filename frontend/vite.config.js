@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/': {
-        target: process.env.VITE_BACKEND_URL,
+        target: "https://teamtodoapp-backend-production.up.railway.app",
         changeOrigin: true,
         secure: false,
       },

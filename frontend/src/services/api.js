@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Crear una instancia de axios con la configuración base
 const api = axios.create({
-    baseURL: import.meta.env.VITE_BACKEND_URL,
+    baseURL: "https://teamtodoapp-backend-production.up.railway.app",
     timeout: 20000, 
     headers: {
         'Content-Type': 'application/json', // Asegura el tipo de contenido por defecto

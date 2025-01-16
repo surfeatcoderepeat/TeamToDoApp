@@ -8,7 +8,6 @@ ARG VITE_GOOGLE_CLIENT_ID
 
 # Configura las variables de entorno para el build
 ENV VITE_BACKEND_URL=${VITE_BACKEND_URL}
-ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
 
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
@@ -18,7 +17,12 @@ RUN npm run build
 
 # Etapa 2: Servir los archivos estáticos con nginx
 FROM --platform=linux/amd64 nginx:alpine
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copiar la plantilla de nginx y el script
+COPY nginx.template.conf /etc/nginx/nginx.template.conf
+COPY start-nginx.sh /usr/local/bin/start-nginx.sh
 COPY --from=build /app/dist /usr/share/nginx/html
+
+# Dar permisos al script
+RUN chmod +x /usr/local/bin/start-nginx.sh
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["start-nginx.sh"]

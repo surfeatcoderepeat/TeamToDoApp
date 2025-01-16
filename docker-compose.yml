@@ -6,6 +6,8 @@ services:
       args: # Pasar variables al momento del build
         VITE_BACKEND_URL: ${BACKEND_URL}
         VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    environment:
+      VITE_BACKEND_URL: ${BACKEND_URL} 
     env_file:
     - .env 
     image: tinchopipa/teamtodoapp-frontend:latest
