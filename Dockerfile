@@ -3,10 +3,12 @@ FROM --platform=linux/amd64 node:18-alpine AS build
 WORKDIR /app
 
 # Define los argumentos para las variables de entorno
-ARG VITE_BACKEND_URL
-ARG VITE_GOOGLE_CLIENT_ID
+
+ARG VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
 
 # Configura las variables de entorno para el build
+ARG VITE_BACKEND_URL=${VITE_BACKEND_URL}
 ENV VITE_BACKEND_URL=${VITE_BACKEND_URL}
 
 COPY frontend/package.json frontend/package-lock.json ./

@@ -8,6 +8,10 @@ from .serializers import TaskSerializer, ProjectSerializer
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class ProjectList(APIView):
     """
@@ -75,7 +79,8 @@ class ShareProject(APIView):
     def get(self, request, project_pk):
         project = get_object_or_404(Project, pk=project_pk, users=request.user)
         share_token, created = ShareToken.objects.get_or_create(project=project)
-        share_link = f"{request.scheme}://localhost:5173/join-project/{share_token.token}/"
+        backend_url = os.getenv('VITE_BACKEND_URL')
+        share_link = f"{backend_url}/api/join-project/{share_token.token}/"
         return Response({'share_link': share_link}, status=status.HTTP_200_OK)
     
 class JoinProject(APIView):

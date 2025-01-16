@@ -27,6 +27,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - VITE_BACKEND_URL=${BACKEND_URL}
       - DATABASE_URL=${DATABASE_URL}  # URL de la base de datos en Railway
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
