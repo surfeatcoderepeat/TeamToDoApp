@@ -15,17 +15,37 @@ DEBUG = os.getenv('DEBUG')
 ALLOWED_HOSTS = [
     'localhost',
     'teamtodoapp-frontend-production.up.railway.app',
+    'teamtodoapp-backend-production.up.railway.app',
 ]
 
 # Configuración de CORS
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost",
     "https://teamtodoapp-frontend-production.up.railway.app",
+    "http://localhost",
+    "https://teamtodoapp-backend-production.up.railway.app",
 ]
 
+# Configuración de métodos y encabezados permitidos para CORS
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+    'OPTIONS',
+]
+
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'accept',
+    'Authorization',
+    'X-Requested-With',
+]
+
+# Configuración de CSRF
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     "https://teamtodoapp-frontend-production.up.railway.app",
+    'https://teamtodoapp-backend-production.up.railway.app',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
